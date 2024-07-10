@@ -1,31 +1,49 @@
-/* EXAMPLE OF AN API REQUEST */
+// Coordonnées et clé API pour Bordeaux
+const longitude = 44.83; // Longitude de Bordeaux
+const latitude = -0.57; // Latitude de Bordeaux
+const api_key = '08cb792ca8906ae401dad848ccb6410d'; // Clé API (exemple fourni)
 
-/*
-let longitude = 44.83; // Bordeaux longitude
-let latitude = -0.57; // Bordeaux latitude
-let api_key = '891fcaaa0f613df11046ed15bd1a4607'; // Teacher's API Key
-let api_url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${api_key}`; // API URL
-
-const getWeather = () => {
-  axios.get(api_url)
-  .then((response)=>console.log(response.data.main.temp - 273.15))
-  .catch((err)=> console.log(err))
-}
-getWeather();
-*/
-
-
-
-
-export const fetchData = async () => {
-    // Your code here: Implement an API request (e.g., fetch data from a fictional API).
-  };
-  
-  // script.js
-  import { fetchData } from './ex4';
-  
-  function displayData() {
-    // Your code here: Fetch and display data from the API using fetchData.
+// Fonction pour effectuer une requête API et récupérer les données
+const fetchData = async () => {
+  const api_url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${api_key}`;
+  try {
+    const response = await fetch(api_url);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching weather data:', error);
+    throw error;
   }
-  
-  document.addEventListener('DOMContentLoaded', displayData);
+};
+
+// Fonction pour convertir Kelvin en Celsius
+const kelvinToCelsius = (kelvin) => (kelvin - 273.15).toFixed(2);
+
+// Fonction pour afficher les données sur la page HTML
+const displayData = async () => {
+  try {
+    const data = await fetchData();
+    const temperatureCelsius = kelvinToCelsius(data.main.temp);
+    console.log(`Temperature in Bordeaux: ${temperatureCelsius}°C`);
+    document.getElementById('paragraph').textContent = `Temperature in Bordeaux: ${temperatureCelsius}°C`;
+  } catch (error) {
+    console.error('Error fetching and displaying data:', error);
+    document.getElementById('paragraph').textContent = 'Failed to fetch weather data. Please try again later.';
+  }
+};
+
+// Exécuter displayData immédiatement après sa définition
+displayData();
+
+// Code pour gérer le bouton de suppression
+const removeButton = document.getElementById('remove-paragraph-button');
+removeButton.addEventListener('click', () => {
+  const paragraphElement = document.getElementById('paragraph');
+  if (paragraphElement) {
+    paragraphElement.parentNode.removeChild(paragraphElement);
+  }
+});
+
+module.exports = { fetchData, displayData };
